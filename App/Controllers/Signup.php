@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use \Core\View;
+use \App\Models\User;
 
 /**
  * Signup controller
@@ -16,8 +17,26 @@ class Signup extends \Core\Controller
    *
    * @return void
    */
-  public function newAction()
-  {
-      View::renderTemplate('Signup/new.html');
+  public function newAction() {
+      View::renderTemplate('Signup/new.html',[
+        'page' => 'signup'
+    ]);
+  }
+
+  public function createAction() {
+      $newUser = new User($_POST);
+      
+      if ($newUser->create()) {
+        header('Location: /login-mvc/signup/success');
+      } else {
+        View::renderTemplate('Signup/new.html', [
+          'user' => $newUser,
+          'page' => 'signup'
+        ]);
+      }
+  }
+
+  public function successAction() {
+    View::renderTemplate('Signup/success.html');
   }
 }
