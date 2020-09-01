@@ -30,6 +30,20 @@ abstract class Controller {
     protected function after() {
 
     }
+
+    public function redirect($url) {
+        header('location: /login-mvc' . $url, true, 303);
+        exit;
+    }
+
+    public static function username() {
+        $name = '';
+        if (isset($_SESSION['username'])) {
+            $name = $_SESSION['username'];
+        }
+
+        return $name;
+    }
 }
 
 ?>

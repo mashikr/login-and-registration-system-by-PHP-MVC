@@ -1,5 +1,5 @@
 <?php
-
+session_start();
 require '../vendor/autoload.php';
 
 spl_autoload_register(function ($class) {
@@ -19,6 +19,8 @@ $router = new Core\Router();
 
 // Add the routes
 $router->add('', ['controller' => 'Home', 'action' => 'index']);
+$router->add('login', ['controller' => 'Login', 'action' => 'login']);
+$router->add('logout', ['controller' => 'Login', 'action' => 'logout']);
 $router->add('{controller}/{action}');
 
 

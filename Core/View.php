@@ -24,6 +24,8 @@ class view {
         if ($twig === null) {
             $loader = new \Twig\Loader\FilesystemLoader('../App/Views');
             $twig = new \Twig\Environment($loader);
+            $twig->addGlobal('username', \Core\Controller::username());
+            $twig->addGlobal('flash_msg', \App\Flash::getMessage());
         }
 
         echo $twig->render($template, $args);

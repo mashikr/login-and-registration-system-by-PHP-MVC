@@ -28,6 +28,13 @@
                 <li class="nav-item {% if page == 'signup' %} active{% endif %}">
                   <a class="nav-link" href="/login-mvc/signup/new">Sign Up</a>
                 </li>
+                <li class="nav-item {% if page == 'login' %} active{% endif %}">
+                  {% if username %}
+                    <a class="nav-link" href="/login-mvc/logout">Logout</a>
+                  {% else %}
+                    <a class="nav-link" href="/login-mvc/login">Login</a>
+                  {% endif %}
+                </li>
               </ul>
             </div>
           </nav>

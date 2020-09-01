@@ -27,7 +27,7 @@ class Signup extends \Core\Controller
       $newUser = new User($_POST);
       
       if ($newUser->create()) {
-        header('Location: /login-mvc/signup/success');
+        $this->redirect('/signup/success');
       } else {
         View::renderTemplate('Signup/new.html', [
           'user' => $newUser,
