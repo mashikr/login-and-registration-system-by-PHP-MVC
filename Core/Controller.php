@@ -1,6 +1,7 @@
 <?php
 
 namespace Core;
+use \App\Models\User;
 
 abstract class Controller {
     protected $route_params = [];
@@ -38,8 +39,14 @@ abstract class Controller {
 
     public static function username() {
         $name = '';
+        $cookie = $_COOKIE['remember_me'] ?? false;
         if (isset($_SESSION['username'])) {
             $name = $_SESSION['username'];
+        } elseif ($cookie) {
+            $user = User::getUserByToken($cookie);
+            $_SESSION['user_id'] = $user['user_id'];
+            $_SESSION['username'] = $user['name'];
+            $name = $user['name'];
         }
 
         return $name;
