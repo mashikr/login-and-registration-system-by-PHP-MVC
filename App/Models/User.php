@@ -22,8 +22,12 @@ class User extends \Core\Model {
 
         if (empty($this->errors)) {
             try {
+                $token = new Token();
+                $hashed_token = $token->getHash();
+                $active_token = $token->getValue();
+
                 $this->password = password_hash($this->password, PASSWORD_DEFAULT);
-                $sql = "INSERT INTO `users`(`username`, `email`, `password`) VALUES (:username,:email,:password)";
+                $sql = "INSERT INTO `users`(`username`, `email`, `password`, `account_active_hash`) VALUES (:username,:email,:password,:active_hash)";
                 
                 $db = static::getDB();
                 $stmt = $db->prepare($sql);
@@ -31,14 +35,28 @@ class User extends \Core\Model {
                 $stmt->bindValue(':username', $this->username, PDO::PARAM_STR);
                 $stmt->bindValue(':email', $this->email, PDO::PARAM_STR);
                 $stmt->bindValue(':password', $this->password, PDO::PARAM_STR);
-                                              
-                return $stmt->execute();
+                $stmt->bindValue(':active_hash', $hashed_token, PDO::PARAM_STR);
+                
+                if ($this->sendActivateEmail($active_token, $this->email)) {
+                    return $stmt->execute();
+                }
+                
+                return false;
             } catch (PDOException $e) {
                 echo $e->getMessage();
             }
         }
 
         return false;
+    }
+
+    protected function sendActivateEmail($token, $email) {
+        $url = "http://localhost/login-mvc/signup/active/" . $token;
+
+        $text = "Please click on the following URL to active your account: " . $url;
+        $html = "Please click <a href='$url'>here</a> to active your account";
+
+        return Mail::send($email, 'Activate account', $text, $html);
     }
 
     protected function validate() {
@@ -71,6 +89,24 @@ class User extends \Core\Model {
         }
     }
 
+    public static function activeAccount($token) {
+        $token = new Token($token);
+        $hashed_token = $token->getHash();
+
+        $sql = "UPDATE `users` SET `account_active_hash`= NULL,`active`= 1 WHERE `account_active_hash` = :hashed_token";
+                
+        $db = static::getDB();
+        $stmt = $db->prepare($sql);
+                                                
+        $stmt->bindValue(':hashed_token', $hashed_token, PDO::PARAM_STR);
+
+        if ($stmt->execute()) {
+            return true;
+        }
+
+        return false;
+    }
+
     public static function emailExists($email, $ignore_id = null) {
         $user = static::findByEmail($email);
 
@@ -84,7 +120,7 @@ class User extends \Core\Model {
     }
 
     public static function findByEmail($email) {
-        $sql = 'SELECT * FROM users WHERE email = :email';
+        $sql = 'SELECT * FROM users WHERE email = :email AND active = 1';
 
         $db = static::getDB();
         $stmt = $db->prepare($sql);
@@ -109,7 +145,7 @@ class User extends \Core\Model {
         return false;
     }
 
-    public static function rememberLogin($id, $name) {
+    public static function rememberLogin($id, $name, $email) {
         $token = new Token();
         $hashed_token = $token->getHash();
         $remember_token = $token->getValue();
@@ -118,7 +154,7 @@ class User extends \Core\Model {
 
         setcookie('remember_me', $remember_token, $expire_timestamp, '/');
 
-        $sql = 'INSERT INTO `remember_logins`(`token`, `user_id`, `name`, `expired_at`) VALUES (:token, :user_id, :name, :expire_at)';
+        $sql = 'INSERT INTO `remember_logins`(`token`, `user_id`, `name`, `email`, `expired_at`) VALUES (:token, :user_id, :name, :email, :expire_at)';
 
         $db = static::getDB();
         $stmt = $db->prepare($sql);
@@ -126,6 +162,7 @@ class User extends \Core\Model {
         $stmt->bindValue(':token', $hashed_token, PDO::PARAM_STR);
         $stmt->bindValue(':user_id', $id, PDO::PARAM_STR);
         $stmt->bindValue(':name', $name, PDO::PARAM_STR);
+        $stmt->bindValue(':email', $email, PDO::PARAM_STR);
         $stmt->bindValue(':expire_at', date('Y-m-d H:i:s', $expire_timestamp), PDO::PARAM_STR);
 
         return $stmt->execute();
@@ -135,7 +172,7 @@ class User extends \Core\Model {
         $token = new Token($token_code);
         $token_hash = $token->getHash();
 
-        $sql = 'SELECT user_id, name FROM `remember_logins` WHERE `token` = :token';
+        $sql = 'SELECT user_id, name, email FROM `remember_logins` WHERE `token` = :token';
 
         $db = static::getDB();
         $stmt = $db->prepare($sql);

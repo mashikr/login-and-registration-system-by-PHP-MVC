@@ -35,6 +35,11 @@
                     <a class="nav-link" href="/login-mvc/login">Login</a>
                   {% endif %}
                 </li>
+                <li class="nav-item {% if page == 'profile' %} active{% endif %}">
+                  {% if username %}
+                    <a class="nav-link" href="/login-mvc/profile/view">Profile</a>
+                  {% endif %}
+                </li>
               </ul>
             </div>
           </nav>

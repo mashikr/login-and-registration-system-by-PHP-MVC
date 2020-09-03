@@ -22,12 +22,12 @@ $router->add('', ['controller' => 'Home', 'action' => 'index']);
 $router->add('login', ['controller' => 'Login', 'action' => 'login']);
 $router->add('logout', ['controller' => 'Login', 'action' => 'logout']);
 $router->add('password/reset/{token:[\da-f]+}', ['controller' => 'Password', 'action' => 'reset']);
+$router->add('signup/active/{token:[\da-f]+}', ['controller' => 'Signup', 'action' => 'active']);
 $router->add('{controller}/{action}');
 
 
 $url = $_SERVER['QUERY_STRING'];
 
 $router->dispatch($url);
-
 
 ?>

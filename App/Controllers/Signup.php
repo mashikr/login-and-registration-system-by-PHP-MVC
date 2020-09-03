@@ -39,4 +39,13 @@ class Signup extends \Core\Controller
   public function successAction() {
     View::renderTemplate('Signup/success.html');
   }
+
+  public function activeAction() {
+    $token = $this->route_params['token'];
+    if (User::activeAccount($token)) {
+      View::renderTemplate('Signup/activateSuccess.html');
+    } else {
+      View::renderTemplate('Signup/activateError.html');
+    }
+  }
 }

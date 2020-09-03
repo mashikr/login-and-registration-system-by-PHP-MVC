@@ -46,6 +46,8 @@ abstract class Controller {
             $user = User::getUserByToken($cookie);
             $_SESSION['user_id'] = $user['user_id'];
             $_SESSION['username'] = $user['name'];
+            $_SESSION['email'] = $user['email'];
+            
             $name = $user['name'];
         }
 

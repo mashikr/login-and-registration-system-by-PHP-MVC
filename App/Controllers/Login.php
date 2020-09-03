@@ -17,15 +17,17 @@ class Login extends \Core\Controller {
 
   public function newAction() {
       $user = User::authenticate($_POST['email'], $_POST['password']);
-      $remember_me = '';
+      $remember_me = null;
       if ($user) {
           session_regenerate_id(true);
           $_SESSION['user_id'] = $user->id;
           $_SESSION['username'] = $user->username;
+          $_SESSION['email'] = $user->email;
 
-          $remember_me = isset($_POST['remember_me']);
-          User::rememberLogin($user->id, $user->username);
-
+          if (isset($_POST['remember_me'])) {
+            User::rememberLogin($user->id, $user->username, $user->email);
+          }
+          
           Flash::addMessage('Successfully Login!', 'success');
           $this->redirect('/');
       } else {
