@@ -15,6 +15,7 @@ class Config {
     const SHOW_ERROR = true;
 
     const SECRET_KEY = 'GxaXj3QFBnwrVLzNXWOGhdYRxF8m58NV';
+
 }
 
 ?>

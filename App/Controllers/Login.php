@@ -6,18 +6,9 @@ use \Core\View;
 use \App\Flash;
 use \App\Models\User;
 
-/**
- * Signup controller
- *
- * PHP version 7.0
- */
-class Login extends \Core\Controller
-{
-  /**
-   * Show the signup page
-   *
-   * @return void
-   */
+
+class Login extends \Core\Controller {
+
   public function loginAction() {
       View::renderTemplate('Login/login.html',[
         'page' => 'login'

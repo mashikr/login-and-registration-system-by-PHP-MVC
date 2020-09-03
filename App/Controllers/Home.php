@@ -16,6 +16,7 @@ class Home extends \Core\Controller {
     }
 
     public function indexAction() {
+        //\App\Mail::send('test@test.io', 'Test', 'This is test msg', '<b>This is test msg</b>');
         View::renderTemplate('Home/index.html', [
             'page' => 'home'
         ]);
